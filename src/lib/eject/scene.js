@@ -8,6 +8,7 @@
 // Two views share one camera: the overhead sprite-stack view, and a chase view from behind
 // the jet. The camera slides between them, so the switch is a single continuous move.
 
+import { drawOrbit, orbitOpacity } from '../orbit.js'
 import { JET_PALETTE, MODELS } from '../jet-model.js'
 import { PILOT_W, PILOT_L, PILOT_H, PILOT_PIVOT, PILOT_SILL, PILOT_RISER, PILOT_SEAT_BASE, decodePilot } from '../pilot-model.js'
 import { createVoxelPainter, shellOf } from '../voxel-sprite.js'
@@ -4669,6 +4670,13 @@ export function createScene(initial) {
     }
     drawWorld()
     drawSky()
+    const altitude = jets[0]?.z ?? 0
+    const opacity = orbitOpacity(altitude)
+    if (opacity > 0) {
+      const horizon = vQ > 1e-7 ? vCy - (vS * vTan) / vQ : NaN
+      drawOrbit(fb, zbuf, W, colLo, colHi, rowLo, rowHi, w0, h0,
+        vCx, vCy, horizon, vC + vK, vYaw, altitude, opacity)
+    }
     drawTrails()
     drawWake()
     drawSmoke()
